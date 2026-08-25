@@ -18,8 +18,9 @@ class ProductListCreateView(APIView):
         query_serializer.is_valid(raise_exception=True)
         page = query_serializer.validated_data['page']
         size = query_serializer.validated_data['size']
+        company_id = query_serializer.validated_data['company_id']
 
-        data = self.service.list_products(page=page, size=size)
+        data = self.service.list_products(page=page, size=size, company_id=company_id)
         serializer = ProductSerializer(data['results'], many=True)
         return Response({
             'total': data['total'],

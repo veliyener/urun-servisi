@@ -14,6 +14,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductListQuerySerializer(serializers.Serializer):
     page = serializers.IntegerField(required=False, default=1, min_value=1)
     size = serializers.IntegerField(required=False, default=20, min_value=1)
+    company_id = serializers.UUIDField(required=False, default=None)
 
     def validate_size(self, value):
         if value > 100:
