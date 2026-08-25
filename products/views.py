@@ -58,3 +58,10 @@ class ProductDetailView(APIView):
             return Response({'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         serializer = ProductSerializer(product)
         return Response(serializer.data)
+
+    def delete(self, request, id):
+        try:
+            self.service.delete_product(id)
+        except ProductNotFoundError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_204_NO_CONTENT)
