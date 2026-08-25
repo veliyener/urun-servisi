@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import ProductSerializer, ProductListQuerySerializer
-from .services import ProductService, DuplicateBarcodeError
+from .services import ProductService, DuplicateBarcodeError, ProductNotFoundError
 
 
 class ProductListCreateView(APIView):
@@ -41,3 +41,20 @@ class ProductListCreateView(APIView):
             return Response({'barcode': [str(e)]}, status=status.HTTP_409_CONFLICT)
         result = ProductSerializer(product)
         return Response(result.data, status=status.HTTP_201_CREATED)
+
+
+class ProductDetailView(APIView):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = ProductService()
+
+    def get_serializer(self, *args, **kwargs):
+        return ProductSerializer(*args, **kwargs)
+
+    def get(self, request, id):
+        try:
+            product = self.service.get_product(id)
+        except ProductNotFoundError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
