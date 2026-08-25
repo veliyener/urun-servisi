@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import ProductSerializer, ProductListQuerySerializer
-from .services import ProductService
+from .services import ProductService, DuplicateBarcodeError
 
 
 class ProductListCreateView(APIView):
@@ -31,10 +31,13 @@ class ProductListCreateView(APIView):
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        product = self.service.create_product(
-            company_id=serializer.validated_data['company_id'],
-            barcode=serializer.validated_data['barcode'],
-            name=serializer.validated_data['name'],
-        )
+        try:
+            product = self.service.create_product(
+                company_id=serializer.validated_data['company_id'],
+                barcode=serializer.validated_data['barcode'],
+                name=serializer.validated_data['name'],
+            )
+        except DuplicateBarcodeError as e:
+            return Response({'barcode': [str(e)]}, status=status.HTTP_409_CONFLICT)
         result = ProductSerializer(product)
         return Response(result.data, status=status.HTTP_201_CREATED)
