@@ -2,12 +2,18 @@ from .models import Product
 
 
 class ProductRepository:
-    def get_page(self, page: int, size: int):
+    def get_page(self, page: int, size: int, company_id=None):
+        queryset = Product.objects.all()
+        if company_id is not None:
+            queryset = queryset.filter(company_id=company_id)
         offset = (page - 1) * size
-        return Product.objects.all()[offset:offset + size]
+        return queryset[offset:offset + size]
 
-    def count_all(self) -> int:
-        return Product.objects.count()
+    def count_all(self, company_id=None) -> int:
+        queryset = Product.objects.all()
+        if company_id is not None:
+            queryset = queryset.filter(company_id=company_id)
+        return queryset.count()
 
     def get_by_id(self, product_id):
         return Product.objects.filter(id=product_id).first()

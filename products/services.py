@@ -14,9 +14,9 @@ class ProductService:
     def __init__(self):
         self.repository = ProductRepository()
 
-    def list_products(self, page: int = 1, size: int = 20):
-        products = self.repository.get_page(page, size)
-        total = self.repository.count_all()
+    def list_products(self, page: int = 1, size: int = 20, company_id=None):
+        products = self.repository.get_page(page, size, company_id)
+        total = self.repository.count_all(company_id)
         return {
             'total': total,
             'page': page,
