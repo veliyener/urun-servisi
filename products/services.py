@@ -1,4 +1,9 @@
 from .repositories import ProductRepository
+from .messages import Messages
+
+
+class DuplicateBarcodeError(Exception):
+    pass
 
 
 class ProductService:
@@ -16,4 +21,6 @@ class ProductService:
         }
 
     def create_product(self, company_id, barcode: str, name: str):
+        if self.repository.exists_by_company_and_barcode(company_id, barcode):
+            raise DuplicateBarcodeError(Messages.BARCODE_ALREADY_EXISTS_FOR_COMPANY)
         return self.repository.create(company_id, barcode, name)
