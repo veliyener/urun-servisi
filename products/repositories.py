@@ -17,3 +17,6 @@ class ProductRepository:
 
     def create(self, company_id, barcode: str, name: str):
         return Product.objects.create(company_id=company_id, barcode=barcode, name=name)
+
+    def delete(self, product):
+        product.delete()

@@ -34,3 +34,7 @@ class ProductService:
         if self.repository.exists_by_company_and_barcode(company_id, barcode):
             raise DuplicateBarcodeError(Messages.BARCODE_ALREADY_EXISTS_FOR_COMPANY)
         return self.repository.create(company_id, barcode, name)
+
+    def delete_product(self, product_id):
+        product = self.get_product(product_id)
+        self.repository.delete(product)
