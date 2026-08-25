@@ -9,6 +9,9 @@ class ProductRepository:
     def count_all(self) -> int:
         return Product.objects.count()
 
+    def get_by_id(self, product_id):
+        return Product.objects.filter(id=product_id).first()
+
     def exists_by_company_and_barcode(self, company_id, barcode: str) -> bool:
         return Product.objects.filter(company_id=company_id, barcode=barcode).exists()
 

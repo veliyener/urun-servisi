@@ -6,6 +6,10 @@ class DuplicateBarcodeError(Exception):
     pass
 
 
+class ProductNotFoundError(Exception):
+    pass
+
+
 class ProductService:
     def __init__(self):
         self.repository = ProductRepository()
@@ -19,6 +23,12 @@ class ProductService:
             'size': size,
             'results': products,
         }
+
+    def get_product(self, product_id):
+        product = self.repository.get_by_id(product_id)
+        if product is None:
+            raise ProductNotFoundError(Messages.PRODUCT_NOT_FOUND)
+        return product
 
     def create_product(self, company_id, barcode: str, name: str):
         if self.repository.exists_by_company_and_barcode(company_id, barcode):
