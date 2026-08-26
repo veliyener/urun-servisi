@@ -1,5 +1,6 @@
 from .repositories import ProductRepository
 from .messages import Messages
+from clients.company_client import CompanyClient
 
 
 class DuplicateBarcodeError(Exception):
@@ -10,9 +11,18 @@ class ProductNotFoundError(Exception):
     pass
 
 
+class CompanyNotFoundError(Exception):
+    pass
+
+
+class CompanyPassiveError(Exception):
+    pass
+
+
 class ProductService:
     def __init__(self):
         self.repository = ProductRepository()
+        self.company_client = CompanyClient()
 
     def list_products(self, page: int = 1, size: int = 20, company_id=None):
         products = self.repository.get_page(page, size, company_id)
@@ -31,6 +41,12 @@ class ProductService:
         return product
 
     def create_product(self, company_id, barcode: str, name: str):
+        company = self.company_client.get_company(company_id)
+        if company is None:
+            raise CompanyNotFoundError(Messages.COMPANY_NOT_FOUND)
+        if company['status'] != 'active':
+            raise CompanyPassiveError(Messages.COMPANY_PASSIVE)
+
         if self.repository.exists_by_company_and_barcode(company_id, barcode):
             raise DuplicateBarcodeError(Messages.BARCODE_ALREADY_EXISTS_FOR_COMPANY)
         return self.repository.create(company_id, barcode, name)
