@@ -2,7 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import ProductSerializer, ProductListQuerySerializer
-from .services import ProductService, DuplicateBarcodeError, ProductNotFoundError
+from .services import (
+    ProductService,
+    DuplicateBarcodeError,
+    ProductNotFoundError,
+    CompanyNotFoundError,
+    CompanyPassiveError,
+)
 
 
 class ProductListCreateView(APIView):
@@ -38,6 +44,10 @@ class ProductListCreateView(APIView):
                 barcode=serializer.validated_data['barcode'],
                 name=serializer.validated_data['name'],
             )
+        except CompanyNotFoundError as e:
+            return Response({'company_id': [str(e)]}, status=status.HTTP_400_BAD_REQUEST)
+        except CompanyPassiveError as e:
+            return Response({'company_id': [str(e)]}, status=status.HTTP_409_CONFLICT)
         except DuplicateBarcodeError as e:
             return Response({'barcode': [str(e)]}, status=status.HTTP_409_CONFLICT)
         result = ProductSerializer(product)
