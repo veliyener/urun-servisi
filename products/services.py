@@ -48,7 +48,7 @@ class ProductService:
     def create_product(self, company_id, barcode: str, name: str):
         try:
             company = self.company_client.get_company(company_id)
-        except requests.exceptions.ConnectionError:
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             raise CompanyServiceUnavailableError(Messages.COMPANY_SERVICE_UNAVAILABLE)
 
         if company is None:
