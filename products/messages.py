@@ -4,3 +4,4 @@ class Messages:
     PRODUCT_NOT_FOUND = "Böyle bir ürün bulunamadı."
     COMPANY_NOT_FOUND = "Belirtilen firma bulunamadı."
     COMPANY_PASSIVE = "Bu firma pasif durumda, ürün eklenemez."
+    COMPANY_SERVICE_UNAVAILABLE = "Firma bilgisi şu anda doğrulanamıyor, lütfen birazdan tekrar deneyin."

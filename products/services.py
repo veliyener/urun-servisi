@@ -1,3 +1,4 @@
+import requests
 from .repositories import ProductRepository
 from .messages import Messages
 from clients.company_client import CompanyClient
@@ -16,6 +17,10 @@ class CompanyNotFoundError(Exception):
 
 
 class CompanyPassiveError(Exception):
+    pass
+
+
+class CompanyServiceUnavailableError(Exception):
     pass
 
 
@@ -41,7 +46,11 @@ class ProductService:
         return product
 
     def create_product(self, company_id, barcode: str, name: str):
-        company = self.company_client.get_company(company_id)
+        try:
+            company = self.company_client.get_company(company_id)
+        except requests.exceptions.ConnectionError:
+            raise CompanyServiceUnavailableError(Messages.COMPANY_SERVICE_UNAVAILABLE)
+
         if company is None:
             raise CompanyNotFoundError(Messages.COMPANY_NOT_FOUND)
         if company['status'] != 'active':

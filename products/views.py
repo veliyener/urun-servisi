@@ -8,6 +8,7 @@ from .services import (
     ProductNotFoundError,
     CompanyNotFoundError,
     CompanyPassiveError,
+    CompanyServiceUnavailableError,
 )
 
 
@@ -44,6 +45,8 @@ class ProductListCreateView(APIView):
                 barcode=serializer.validated_data['barcode'],
                 name=serializer.validated_data['name'],
             )
+        except CompanyServiceUnavailableError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         except CompanyNotFoundError as e:
             return Response({'company_id': [str(e)]}, status=status.HTTP_400_BAD_REQUEST)
         except CompanyPassiveError as e:
