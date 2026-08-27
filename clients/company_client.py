@@ -1,8 +1,9 @@
 import requests
+from decouple import config
 
 
 class CompanyClient:
-    BASE_URL = "http://localhost:8000/api/v1/companies"
+    BASE_URL = config('COMPANY_SERVICE_URL')
     TIMEOUT = 2
 
     def get_company(self, company_id):
