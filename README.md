@@ -26,3 +26,13 @@ yaratmaz, değiştiği nadir durumda ise elle güncellemek büyük bir maliyet d
 `urun-servisi`'ndeki kopyaya otomatik yansımaz — iki veritabanı arasında bir senkronizasyon
 mekanizması olmadığı için. Bu bilinçli olarak kabul edilen bir bedel; gerçek bir sistemde bu,
 olay tabanlı (event-driven) bir mimari ile çözülür.
+
+
+
+## Dokümana Önerdiğim Eklemeler
+
+Standartlar dokümanının 3.3 bölümünde karşılığı olmayan, bu hafta karşılaştığım üç durum kodu için öneriler:
+
+- **204 No Content:** Bir kaynak başarıyla silindiğinde, dönecek bir gövde olmadığını belirtmek için kullanılmalı (örn. `DELETE /api/v1/products/{id}`).
+- **503 Service Unavailable:** İstek ve kodumuz doğru olduğu hâlde, bağımlı olunan başka bir servise ulaşılamadığında veya zaman aşımına uğradığında kullanılmalı — bu bizim değil, bağımlı servisin geçici arızasıdır.
+- **401 Unauthorized:** İsteğin kimlik bilgisi (bu projede `X-User-Id` başlığı) eksik veya geçersiz olduğunda kullanılmalı; sunucu isteği yapanın kim olduğunu bilmiyor demektir.
