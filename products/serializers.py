@@ -6,8 +6,8 @@ from .messages import Messages
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'company_id', 'barcode', 'name', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        fields = ['id', 'company_id', 'company_title', 'barcode', 'name', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'company_title', 'created_at', 'updated_at']
         validators = []
 
 
