@@ -5,3 +5,4 @@ class Messages:
     COMPANY_NOT_FOUND = "Belirtilen firma bulunamadı."
     COMPANY_PASSIVE = "Bu firma pasif durumda, ürün eklenemez."
     COMPANY_SERVICE_UNAVAILABLE = "Firma bilgisi şu anda doğrulanamıyor, lütfen birazdan tekrar deneyin."
+    USER_ID_REQUIRED = "Bu işlem için X-User-Id başlığı zorunludur."
