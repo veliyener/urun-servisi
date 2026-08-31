@@ -2,7 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import ProductSerializer, ProductListQuerySerializer
-from .messages import Messages
+from .messages import Messages, ErrorCodes
+from .error_response import error_response
 from .services import (
     ProductService,
     DuplicateBarcodeError,
@@ -39,7 +40,9 @@ class ProductListCreateView(APIView):
 
     def post(self, request):
         if not request.headers.get('X-User-Id'):
-            return Response({'detail': Messages.USER_ID_REQUIRED}, status=status.HTTP_401_UNAUTHORIZED)
+            return error_response(
+                ErrorCodes.USER_ID_REQUIRED, Messages.USER_ID_REQUIRED, status.HTTP_401_UNAUTHORIZED
+            )
 
         serializer = ProductSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -50,13 +53,21 @@ class ProductListCreateView(APIView):
                 name=serializer.validated_data['name'],
             )
         except CompanyServiceUnavailableError as e:
-            return Response({'detail': str(e)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            return error_response(
+                ErrorCodes.COMPANY_SERVICE_UNAVAILABLE, str(e), status.HTTP_503_SERVICE_UNAVAILABLE
+            )
         except CompanyNotFoundError as e:
-            return Response({'company_id': [str(e)]}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response(
+                ErrorCodes.COMPANY_NOT_FOUND, str(e), status.HTTP_400_BAD_REQUEST, field="company_id"
+            )
         except CompanyPassiveError as e:
-            return Response({'company_id': [str(e)]}, status=status.HTTP_409_CONFLICT)
+            return error_response(
+                ErrorCodes.COMPANY_PASSIVE, str(e), status.HTTP_409_CONFLICT, field="company_id"
+            )
         except DuplicateBarcodeError as e:
-            return Response({'barcode': [str(e)]}, status=status.HTTP_409_CONFLICT)
+            return error_response(
+                ErrorCodes.DUPLICATE_BARCODE, str(e), status.HTTP_409_CONFLICT, field="barcode"
+            )
         result = ProductSerializer(product)
         return Response(result.data, status=status.HTTP_201_CREATED)
 
@@ -73,7 +84,7 @@ class ProductDetailView(APIView):
         try:
             product = self.service.get_product(id)
         except ProductNotFoundError as e:
-            return Response({'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
+            return error_response(ErrorCodes.PRODUCT_NOT_FOUND, str(e), status.HTTP_404_NOT_FOUND)
         serializer = ProductSerializer(product)
         return Response(serializer.data)
 
@@ -81,5 +92,5 @@ class ProductDetailView(APIView):
         try:
             self.service.delete_product(id)
         except ProductNotFoundError as e:
-            return Response({'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
+            return error_response(ErrorCodes.PRODUCT_NOT_FOUND, str(e), status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
