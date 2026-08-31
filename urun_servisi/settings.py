@@ -109,5 +109,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Sonda slash olmayan adresler için (geçen haftaki kural)
+# Sonda slash olmayan adresler için
 APPEND_SLASH = False
+
+
+# Hata cevaplarını tek biçime çeviren özel exception handler
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'products.exception_handlers.custom_exception_handler',
+}
