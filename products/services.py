@@ -1,7 +1,6 @@
-import requests
 from .repositories import ProductRepository
 from .messages import Messages
-from clients.company_client import CompanyClient
+from clients.company_client import CompanyClient, CompanyClientError
 
 
 class DuplicateBarcodeError(Exception):
@@ -48,7 +47,7 @@ class ProductService:
     def create_product(self, company_id, barcode: str, name: str):
         try:
             company = self.company_client.get_company(company_id)
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        except CompanyClientError:
             raise CompanyServiceUnavailableError(Messages.COMPANY_SERVICE_UNAVAILABLE)
 
         if company is None:
