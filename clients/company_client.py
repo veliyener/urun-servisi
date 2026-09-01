@@ -1,4 +1,5 @@
 import requests
+from products.messages import Messages
 
 
 class CompanyClientError(Exception):
@@ -17,6 +18,6 @@ class CompanyClient:
                 return None
             response.raise_for_status()
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.HTTPError):
-            raise CompanyClientError("Firma servisine ulaşılamıyor.")
+            raise CompanyClientError(Messages.COMPANY_CLIENT_UNREACHABLE)
 
         return response.json()
