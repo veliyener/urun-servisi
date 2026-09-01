@@ -2,6 +2,7 @@
 Django settings for urun_servisi project.
 """
 
+import sys
 from pathlib import Path
 from decouple import config
 
@@ -74,6 +75,13 @@ DATABASES = {
         'OPTIONS': {'sslmode': 'require'},
     }
 }
+
+# Testler çalışırken Neon yerine hızlı, geçici bir SQLite veritabanı kullan
+if 'test' in sys.argv or 'pytest' in sys.argv[0]:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
 
 
 # Password validation
