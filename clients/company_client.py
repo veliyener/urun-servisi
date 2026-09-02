@@ -1,4 +1,5 @@
 import requests
+from decouple import config, UndefinedValueError
 from products.messages import Messages
 
 
@@ -6,12 +7,23 @@ class CompanyClientError(Exception):
     pass
 
 
+class CompanyClientConfigurationError(Exception):
+    pass
+
+
 class CompanyClient:
-    BASE_URL = "http://localhost:8000/api/v1/companies"
     TIMEOUT = 2
 
+    def __init__(self):
+        try:
+            self.base_url = config('COMPANY_SERVICE_URL')
+        except UndefinedValueError:
+            raise CompanyClientConfigurationError(
+                "COMPANY_SERVICE_URL ortam değişkeni tanımlı değil."
+            )
+
     def get_company(self, company_id):
-        url = f"{self.BASE_URL}/{company_id}"
+        url = f"{self.base_url}/{company_id}"
         try:
             response = requests.get(url, timeout=self.TIMEOUT)
             if response.status_code == 404:
