@@ -24,9 +24,9 @@ class CompanyServiceUnavailableError(Exception):
 
 
 class ProductService:
-    def __init__(self):
+    def __init__(self, company_client=None):
         self.repository = ProductRepository()
-        self.company_client = CompanyClient()
+        self.company_client = company_client or CompanyClient()
 
     def list_products(self, page: int = 1, size: int = 20, company_id=None):
         products = self.repository.get_page(page, size, company_id)
