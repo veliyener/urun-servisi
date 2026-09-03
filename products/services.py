@@ -1,5 +1,6 @@
 from typing import Optional
 import requests
+from .models import Product
 from .repositories import ProductRepository
 from .messages import Messages
 from clients.company_client import CompanyClient, CompanyClientError
@@ -40,13 +41,13 @@ class ProductService:
             'results': products,
         }
 
-    def get_product(self, product_id: str):
+    def get_product(self, product_id: str) -> Product:
         product = self.repository.get_by_id(product_id)
         if product is None:
             raise ProductNotFoundError(Messages.PRODUCT_NOT_FOUND)
         return product
 
-    def create_product(self, company_id: str, barcode: str, name: str):
+    def create_product(self, company_id: str, barcode: str, name: str) -> Product:
         try:
             company = self.company_client.get_company(company_id)
         except CompanyClientError:
