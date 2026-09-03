@@ -1,3 +1,4 @@
+from typing import Optional
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,14 +16,14 @@ from .services import (
 
 
 class ProductListCreateView(APIView):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.service = ProductService()
 
     def get_serializer(self, *args, **kwargs):
         return ProductSerializer(*args, **kwargs)
 
-    def get(self, request):
+    def get(self, request) -> Response:
         query_serializer = ProductListQuerySerializer(data=request.query_params)
         query_serializer.is_valid(raise_exception=True)
         page = query_serializer.validated_data['page']
@@ -38,7 +39,7 @@ class ProductListCreateView(APIView):
             'results': serializer.data,
         })
 
-    def post(self, request):
+    def post(self, request) -> Response:
         if not request.headers.get('X-User-Id'):
             return error_response(
                 ErrorCodes.USER_ID_REQUIRED, Messages.USER_ID_REQUIRED, status.HTTP_401_UNAUTHORIZED
@@ -73,14 +74,14 @@ class ProductListCreateView(APIView):
 
 
 class ProductDetailView(APIView):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.service = ProductService()
 
     def get_serializer(self, *args, **kwargs):
         return ProductSerializer(*args, **kwargs)
 
-    def get(self, request, id):
+    def get(self, request, id) -> Response:
         try:
             product = self.service.get_product(id)
         except ProductNotFoundError as e:
@@ -88,7 +89,7 @@ class ProductDetailView(APIView):
         serializer = ProductSerializer(product)
         return Response(serializer.data)
 
-    def delete(self, request, id):
+    def delete(self, request, id) -> Response:
         try:
             self.service.delete_product(id)
         except ProductNotFoundError as e:

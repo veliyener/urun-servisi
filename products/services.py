@@ -1,3 +1,5 @@
+from typing import Optional
+import requests
 from .repositories import ProductRepository
 from .messages import Messages
 from clients.company_client import CompanyClient, CompanyClientError
@@ -24,11 +26,11 @@ class CompanyServiceUnavailableError(Exception):
 
 
 class ProductService:
-    def __init__(self, company_client=None):
+    def __init__(self, company_client=None) -> None:
         self.repository = ProductRepository()
         self.company_client = company_client or CompanyClient()
 
-    def list_products(self, page: int = 1, size: int = 20, company_id=None):
+    def list_products(self, page: int = 1, size: int = 20, company_id: Optional[str] = None) -> dict:
         products = self.repository.get_page(page, size, company_id)
         total = self.repository.count_all(company_id)
         return {
@@ -38,13 +40,13 @@ class ProductService:
             'results': products,
         }
 
-    def get_product(self, product_id):
+    def get_product(self, product_id: str):
         product = self.repository.get_by_id(product_id)
         if product is None:
             raise ProductNotFoundError(Messages.PRODUCT_NOT_FOUND)
         return product
 
-    def create_product(self, company_id, barcode: str, name: str):
+    def create_product(self, company_id: str, barcode: str, name: str):
         try:
             company = self.company_client.get_company(company_id)
         except CompanyClientError:
@@ -59,6 +61,6 @@ class ProductService:
             raise DuplicateBarcodeError(Messages.BARCODE_ALREADY_EXISTS_FOR_COMPANY)
         return self.repository.create(company_id, company['title'], barcode, name)
 
-    def delete_product(self, product_id):
+    def delete_product(self, product_id: str) -> None:
         product = self.get_product(product_id)
         self.repository.delete(product)

@@ -1,3 +1,4 @@
+from typing import Optional
 import requests
 from decouple import config, UndefinedValueError
 from products.messages import Messages
@@ -14,15 +15,15 @@ class CompanyClientConfigurationError(Exception):
 class CompanyClient:
     TIMEOUT = 2
 
-    def __init__(self):
+    def __init__(self) -> None:
         try:
             self.base_url = config('COMPANY_SERVICE_URL')
         except UndefinedValueError:
             raise CompanyClientConfigurationError(
-                "COMPANY_SERVICE_URL ortam değişkeni tanımlı değil."
+                "COMPANY_SERVICE_URL ortam degiskeni tanimli degil."
             )
 
-    def get_company(self, company_id):
+    def get_company(self, company_id: str) -> Optional[dict]:
         url = f"{self.base_url}/{company_id}"
         try:
             response = requests.get(url, timeout=self.TIMEOUT)
