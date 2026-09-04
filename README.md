@@ -10,15 +10,39 @@ HTTP üzerinden sorar.
 
 ## Nasıl çalıştırılır
 
-### Gereken paketler
+**Not:** Bu servisin çalışması için `firma-servisi`'nin de kurulu ve çalışıyor olması gerekir. Önce
+[firma-servisi'nin README'sini](https://github.com/veliyener/firma-servisi) takip ederek onu kurup 8000
+portunda çalıştırın, sonra bu adımlara devam edin.
+
+### 1. Repoyu klonlayın
+
+```bash
+git clone https://github.com/veliyener/urun-servisi.git
+cd urun-servisi
+```
+
+### 2. Sanal ortam oluşturun ve aktif edin
+
+```bash
+python -m venv .venv
+.venv\Scripts\Activate.ps1          # Windows
+```
+
+### 3. Paketleri kurun
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### .env dosyası
+### 4. Neon üzerinden bir veritabanı oluşturun
 
-Proje kök dizininde bir `.env` dosyası oluşturun, şu değişkenleri içermeli:
+[neon.tech](https://neon.tech) üzerinden ücretsiz bir hesap açıp **firma-servisi'ninkinden ayrı**, yeni bir
+proje oluşturun. Projenin **Connection Details** kısmından bağlantı bilgilerinizi alın.
+
+### 5. .env dosyasını oluşturun
+
+Proje kök dizininde `.env.example` dosyasını kopyalayıp `.env` adıyla kaydedin, içindeki değerleri
+4. adımda aldığınız gerçek Neon bilgileriyle doldurun:
 
 DB_NAME=<neon-veritabani-adi>
 DB_USER=<neon-kullanici-adi>
@@ -28,22 +52,37 @@ DB_PORT=5432
 COMPANY_SERVICE_URL=http://localhost:8000/api/v1/companies
 
 
-### Komutlar
+### 6. Veritabanı tablolarını oluşturun
 
 ```bash
-python -m venv .venv
-.venv\Scripts\Activate.ps1          # Windows
-pip install -r requirements.txt
 python manage.py migrate
+```
+
+Bir hata alırsanız, büyük ihtimalle `.env` dosyanızdaki bağlantı bilgilerinden biri (özellikle `DB_PORT`)
+yanlış girilmiştir.
+
+### 7. Sunucuyu başlatın
+
+```bash
 python manage.py runserver 8001
 ```
 
-**Not:** Bu servisin çalışması için `firma-servisi`'nin de aynı anda (port 8000'de) çalışıyor olması
-gerekir, çünkü ürün oluşturma isteği ona HTTP ile soru sorar.
+**Dikkat:** Port numarasını (`8001`) belirtmeyi unutmayın, aksi hâlde `firma-servisi` ile aynı porta
+(`8000`) çıkmaya çalışır ve çakışma yaşanır.
+
+### 8. (İsteğe bağlı) Testleri çalıştırın
+
+```bash
+pytest
+```
+
+Testler gerçek Neon veritabanına değil, geçici bir SQLite veritabanına bağlanır; `firma-servisi`'nin
+ayakta olmasına gerek duymaz çünkü servisler arası çağrılar test sırasında taklit edilir (mock'lanır).
 
 ### Port
 
 Bu servis **8001** portunda çalışır: `http://127.0.0.1:8001`
+
 
 ## Mimari
 
