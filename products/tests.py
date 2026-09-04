@@ -1,5 +1,6 @@
 import pytest
 from clients.company_client import CompanyClient, CompanyClientError
+from .messages import Messages
 from .services import (
     ProductService,
     ProductNotFoundError,
@@ -11,7 +12,6 @@ from .services import (
 @pytest.mark.django_db
 def test_olmayan_id_ile_urun_istendiginde_hata_firlar():
     service = ProductService()
-
     with pytest.raises(ProductNotFoundError):
         service.get_product("00000000-0000-0000-0000-000000000000")
 
@@ -23,7 +23,7 @@ class FakeCompanyClient:
 
     def get_company(self, company_id):
         if self.should_raise:
-            raise CompanyClientError("Firma servisine ulasilamiyor.")
+            raise CompanyClientError(Messages.COMPANY_CLIENT_UNREACHABLE)
         return self.company_data
 
 
@@ -31,7 +31,6 @@ class FakeCompanyClient:
 def test_pasif_firmaya_urun_eklenmeye_calisilirsa_hata_firlar_bagimlilik_enjeksiyonu_ile():
     fake_client = FakeCompanyClient(company_data={"id": "x", "title": "Sahte Firma", "status": "passive"})
     service = ProductService(company_client=fake_client)
-
     with pytest.raises(CompanyPassiveError):
         service.create_product(company_id="00000000-0000-0000-0000-000000000000", barcode="1111111111111", name="Test")
 
@@ -39,10 +38,9 @@ def test_pasif_firmaya_urun_eklenmeye_calisilirsa_hata_firlar_bagimlilik_enjeksi
 @pytest.mark.django_db
 def test_firma_servisine_ulasilamadiginda_urun_eklenemez(monkeypatch):
     def fake_get_company(self, company_id):
-        raise CompanyClientError("Firma servisine ulasilamiyor.")
+        raise CompanyClientError(Messages.COMPANY_CLIENT_UNREACHABLE)
 
     monkeypatch.setattr(CompanyClient, "get_company", fake_get_company)
-
     service = ProductService()
     with pytest.raises(CompanyServiceUnavailableError):
         service.create_product(company_id="00000000-0000-0000-0000-000000000000", barcode="2222222222222", name="Test")
