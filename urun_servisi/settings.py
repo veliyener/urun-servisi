@@ -2,6 +2,7 @@
 Django settings for urun_servisi project.
 """
 
+import sys
 from pathlib import Path
 from decouple import config
 
@@ -75,6 +76,13 @@ DATABASES = {
     }
 }
 
+# Testler çalışırken Neon yerine hızlı, geçici bir SQLite veritabanı kullan
+if 'test' in sys.argv or 'pytest' in sys.argv[0]:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
+
 
 # Password validation
 
@@ -109,5 +117,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Sonda slash olmayan adresler için (geçen haftaki kural)
+# Sonda slash olmayan adresler için
 APPEND_SLASH = False
+
+
+# Hata cevaplarını tek biçime çeviren özel exception handler
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'products.exception_handlers.custom_exception_handler',
+}
